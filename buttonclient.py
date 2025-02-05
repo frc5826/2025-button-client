@@ -9,7 +9,7 @@ ntinstance.setServerTeam(5826)
 buttons = ['a','b','c']
 button_dict = {}
 for i in range(len(buttons)):
-    button_dict[buttons[i]] = ntinstance.getBooleanTopic('buttons/'+str(i)).publish()
+    button_dict[buttons[i]] = [ntinstance.getBooleanTopic('buttons/'+str(i)).publish(),False]
 
 def on_press(key):
     if key == keyboard.Key.esc:
@@ -18,19 +18,25 @@ def on_press(key):
         k = key.char
     except:
         k = key.name
-    p = button_dict.get(k)
-    if p != None:
-        p.set(True)
-        print(p.getTopic().getName())
+    if button_dict.get(k) != None:
+        p = button_dict.get(k)[0]
+        last_value = button_dict.get(k)[1]
+        if not last_value:
+            button_dict.get(k)[1] = True
+            p.set(True)
+            print(p.getTopic().getName())
 
 def on_release(key):
     try:
         k = key.char
     except:
         k = key.name
-    p = button_dict.get(k)
-    if p != None:
-        p.set(True)
+    if button_dict.get(k) != None:
+        last_value = button_dict.get(k)[1]
+        p = button_dict.get(k)[0]
+        if p != None and last_value:
+            button_dict.get(k)[1] = False
+            p.set(False)
 
 listener = keyboard.Listener(on_press=on_press, on_release=on_release)
 listener.start()
