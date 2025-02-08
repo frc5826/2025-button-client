@@ -2,11 +2,17 @@ from pynput import keyboard
 from ntcore import *
 
 ntinstance = NetworkTableInstance.getDefault()
-
+import sysconfig; print(sysconfig.get_path("scripts"))
 ntinstance.startClient4('button-client')
 ntinstance.setServerTeam(5826)
 
-buttons = ['a','b','c']
+buttons = []
+
+with open('button-client.ini') as f:
+    buttons = [x.lstrip('0123456789').strip(':\n') for x in f.readlines()]
+
+print('Current buttons: ',buttons)
+
 button_dict = {}
 for i in range(len(buttons)):
     button_dict[buttons[i]] = [ntinstance.getBooleanTopic('buttons/'+str(i)).publish(),False]
